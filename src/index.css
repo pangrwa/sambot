@@ -1,0 +1,18 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+    background-color: black;
+}
+
+.video-container video {
+    width: 854px;
+    height: 480px;
+    background-color: black;
+    object-fit: contain;
+}
+
+.video-container video.loaded {
+    background-color: transparent;
+}
