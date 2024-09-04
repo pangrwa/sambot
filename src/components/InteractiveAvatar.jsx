@@ -152,6 +152,7 @@ function InteractiveAvatar() {
           console.log("No active session")
           return;
         }
+        console.log(aiResponse)
         await avatar.current.speak({
             taskRequest: { text: aiResponse, sessionId: data?.sessionId}
         }).catch((e) => {

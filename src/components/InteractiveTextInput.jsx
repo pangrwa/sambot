@@ -35,6 +35,9 @@ function InteractiveTextInput() {
           ref={input}
           onKeyDown={(e) => {
             if (e.key == "Enter") {
+              if (isLoading || !content.trim()) {
+                return; // shouldn't submit an event
+              }
               e.preventDefault(); // prevent new line
               sendMessage();
             }
