@@ -1,5 +1,6 @@
 import { useRef, useState } from "react";
 import { useAi } from "../hooks/useAi";
+import { Button } from "./ui/button";
 
 function InteractiveTextInput() {
   const input = useRef();
