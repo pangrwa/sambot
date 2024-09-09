@@ -23,10 +23,6 @@ export function DataTable({
     getCoreRowModel: getCoreRowModel(),
   })
 
-  console.log("teting")
-  console.log(table)
-  console.log(table.getRowModel()?.rows ? table.getRowModel().rows : "NOOB")
-
   return (
     <div className="rounded-md border">
       <Table>
