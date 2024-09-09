@@ -1,4 +1,5 @@
 import { useConversation } from "@/hooks/useConversation";
+import { Bot, CircleArrowDown } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 function ScrollContainer({ children }) {
@@ -29,6 +30,8 @@ function ScrollContainer({ children }) {
 
     prevInnerDivHeight.current = innerHeight;
     prevScrollTop.current = outerDivScrollTop;
+    // auto scroll to the bottom
+    handleScrollButtonClick();
   }, [children]);
 
   useEffect(() => {
@@ -93,8 +96,7 @@ function ScrollContainer({ children }) {
       <button
         style={{
           position: "absolute",
-          backgroundColor: "red",
-          color: "white",
+          color: "black",
           left: "50%",
           transform: "translateX(-50%)",
           opacity: showScrollButton ? 1 : 0,
@@ -102,7 +104,7 @@ function ScrollContainer({ children }) {
         }}
         onClick={handleScrollButtonClick}
       >
-        New message!
+        <CircleArrowDown />
       </button>
     </div>
   );
@@ -110,11 +112,14 @@ function ScrollContainer({ children }) {
 
 function ChatMessage({ message, role }) {
   return (
-    <div className="py-2 px-5">
+    <div className="py-2 px-5 flex m-1">
         {role === 'user' ? (
-            <div className="p-2 bg-indigo-300">{message}</div>
+            <div className="p-3 ml-auto bg-slate-200 rounded-xl">{message}</div>
         ) : (
-            <div className="p-2 bg-red-200">{message}</div>
+            <div className="mr-auto"> 
+              <Bot />
+              <div className="p-3 self-start">{message}</div>
+            </div>
         ) }
     </div>
   );
@@ -129,8 +134,7 @@ function ConversationInterface() {
 
   return (
     <>
-      <h1 className="text-xl">Conversation</h1>
-      <div className="w-full border-black border-2 p-5 flex flex-col items-center">
+      <div className="w-full p-5 flex flex-col items-center">
         <div className="h-[500px] w-full border-green border-2">
           <ScrollContainer>
             {conversations.map((message, index) => (
