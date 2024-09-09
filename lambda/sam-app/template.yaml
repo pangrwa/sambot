@@ -61,6 +61,20 @@ Resources:
           Properties:
             Path: /message/{id}
             Method: POST 
+  deleteMessagesFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: src/handlers/delete-messages.deleteMessagesHandler
+      Runtime: nodejs20.x
+      Architectures:
+        - x86_64
+      Timeout: 100
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: /message/{id}
+            Method: DELETE
 Outputs:
   WebEndpoint:
     Description: "API Gateway endpoint URL for Prod stage"
