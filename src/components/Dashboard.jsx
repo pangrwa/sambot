@@ -46,11 +46,15 @@ import {
 import ChatInterface from "./AvatarInterface";
 import AvatarInterface from "./AvatarInterface";
 import ConversationInterface from "./ConversationInterface";
+import { Outlet, useLocation } from "react-router-dom";
 
 export const description =
   "An AI playground with a sidebar navigation and a main content area. The playground has a header with a settings drawer and a share button. The sidebar has navigation links and a user menu. The main content area shows a form to configure the model and messages.";
 
 export function Dashboard() {
+  const location = useLocation();
+  const currentPath = location.pathname;
+
   return (
     <div className="grid h-screen w-full pl-[56px]">
       <aside className="inset-y fixed  left-0 z-20 flex h-full flex-col border-r">
@@ -63,34 +67,38 @@ export function Dashboard() {
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
+                <a href="/">
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="rounded-lg bg-muted"
-                  aria-label="Playground"
+                  className={`rounded-lg ${currentPath === '/' ? 'bg-muted' : ""}`}
+                  aria-label="ChatBot"
                 >
-                  <SquareTerminal className="size-5" />
+                  <Bot className="size-5" />
                 </Button>
+                </a>
               </TooltipTrigger>
               <TooltipContent side="right" sideOffset={5}>
-                Playground
+                ChatBot
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="rounded-lg"
-                  aria-label="Models"
-                >
-                  <Bot className="size-5" />
-                </Button>
+                <a href="/files">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className={`rounded-lg ${currentPath === '/files' ? 'bg-muted' : ""}`}
+                    aria-label="Files"
+                  >
+                    <SquareTerminal className="size-5" />
+                  </Button>
+                </a>
               </TooltipTrigger>
               <TooltipContent side="right" sideOffset={5}>
-                Models
+                Files
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
@@ -264,14 +272,7 @@ export function Dashboard() {
           </Button>
         </header>
         <main className="grid flex-1 gap-4 overflow-auto p-4 md:grid-cols-2 lg:grid-cols-2">
-          <div>
-            <ConversationInterface/>
-          </div>
-          <div className="col-span-1 justify-self-end">
-            <div className="p-4 rounded-xl flex flex-col gap-4">
-              <AvatarInterface/>
-            </div>
-          </div>
+          <Outlet />
           {/* <div
             className="relative hidden flex-col items-start gap-8 md:flex"
             x-chunk="dashboard-03-chunk-0"

@@ -142,11 +142,8 @@ function ConversationInterface() {
             ))}
           </ScrollContainer>
         </div>
-        <div
-          style={{
-            marginTop: "8px",
-          }}
-        >
+        <div className="pt-5">
+            Clear Conversation
         </div>
       </div>
     </>
