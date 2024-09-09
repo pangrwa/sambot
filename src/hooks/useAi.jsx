@@ -1,9 +1,11 @@
 import { createContext, useContext, useState } from "react";
+import { useConversation } from "./useConversation";
 
 const AIContext = createContext();
 
 export const AIProvider = ({ children }) => {
   const [aiResponse, setAiResponse] = useState("");
+  const { setConversations } = useConversation();
 
   async function generateAIResponse(question) {
     try {
@@ -21,6 +23,10 @@ export const AIProvider = ({ children }) => {
         aiMessage = "I am currently unable to answer your question."
       }
       setAiResponse(aiMessage);
+      setConversations((prevConversations) => [...prevConversations, {
+        role: 'assistant',
+        message: aiMessage
+      }]);
     } catch (error) {
       console.error("AI is not responding: ", error);
     }
