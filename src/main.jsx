@@ -5,9 +5,10 @@ import "./index.css";
 import { AIProvider } from "./hooks/useAi.jsx";
 import { ConversationProvider } from "./hooks/useConversation.jsx";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import ErrorPage from "./pages/ErrorPage.jsx"
+import ErrorPage from "./pages/ErrorPage.jsx";
 import FilePage from "./pages/FilePage.jsx";
 import ConversationPage from "./pages/ConversationPage.jsx";
+import { FileProvider } from "./hooks/useFiles.jsx";
 
 const router = createBrowserRouter([
   {
@@ -17,22 +18,24 @@ const router = createBrowserRouter([
     children: [
       {
         path: "/",
-        element: <ConversationPage />
+        element: <ConversationPage />,
       },
       {
         path: "/files",
-        element: <FilePage />
-      }
-    ]
-  }
+        element: <FilePage />,
+      },
+    ],
+  },
 ]);
 
 createRoot(document.getElementById("root")).render(
   // <StrictMode>
-    <ConversationProvider>
+  <ConversationProvider>
+    <FileProvider>
       <AIProvider>
         <RouterProvider router={router} />
       </AIProvider>
-    </ConversationProvider>
+    </FileProvider>
+  </ConversationProvider>
   // </StrictMode>,
 );

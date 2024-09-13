@@ -3,7 +3,7 @@ import ConversationInterface from "@/components/ConversationInterface";
 
 export default function ConversationPage() {
   return (
-    <>
+    <div className="grid flex-1 gap-4 overflow-auto p-4 md:grid-cols-2 lg:grid-cols-2">
       <div>
         <ConversationInterface />
       </div>
@@ -12,6 +12,6 @@ export default function ConversationPage() {
             <AvatarInterface />
         </div>
       </div>
-    </>
+    </div>
   );
 }

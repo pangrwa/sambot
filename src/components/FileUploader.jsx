@@ -12,11 +12,12 @@ import {
   AlertDialogCancel,
   AlertDialogAction,
 } from "./ui/alert-dialog";
+import { useFile } from "@/hooks/useFiles";
 
 function Result({ status }) {
   if (status === "success") {
     return <p>✅ File uploaded successfully!</p>;
-  } else if (status === "fail") {
+  } else if (status === "failed") {
     return <p>❌ File upload failed!</p>;
   } else if (status === "uploading") {
     return <p>⏳ Uploading selected file...</p>;
@@ -51,7 +52,7 @@ function FileDialog({file, handleFileChange, handleUpload, status}) {
           <AlertDialogDescription>
             Press the Upload button to upload the file
           </AlertDialogDescription>
-          <Result status={status} />{" "}
+          <Result status={status} />
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
@@ -66,6 +67,7 @@ export default function FileUploader() {
   const [file, setFile] = useState(null);
   // initial, uploading, success, failed
   const [status, setStatus] = useState("initial");
+  const { uploadFile } = useFile();
 
   function handleFileChange(event) {
     if (event.target.files) {
@@ -74,26 +76,21 @@ export default function FileUploader() {
     }
   }
 
-  function handleUpload() {
+  async function handleUpload() {
     if (!file) {
       return;
     }
     setStatus("uploading");
-    console.log("Uploading file...");
-    const formData = new FormData();
-    formData.append("file", file);
-    try {
-      // fetch POST api to lambda to store in S3 bucket
-      console.log(formData);
+    if (await uploadFile(file)) {
       setStatus("success");
-    } catch (error) {
+    } else {
+      console.log("yo come one")
       setStatus("failed");
-      console.error(error);
     }
   }
 
   return (
-    <div className="flex flex-col">
+    <div className="self-end">
       <FileDialog file={file} handleFileChange={handleFileChange} handleUpload={handleUpload} status={status}/>
     </div>
   );
