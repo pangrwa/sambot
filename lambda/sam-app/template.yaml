@@ -12,6 +12,13 @@ Description: >-
 Transform:
 - AWS::Serverless-2016-10-31
 
+# I think for API-gateway to accept certain binary media types?
+Globals:
+ Api:
+  BinaryMediaTypes:
+    - "multipart/form-data"
+
+
 # Resources declares the AWS resources that you want to include in the stack
 # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/resources-section-structure.html
 Resources:
@@ -75,6 +82,48 @@ Resources:
           Properties:
             Path: /message/{id}
             Method: DELETE
+  getFileInfoFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: src/handlers/get-file-info.getFileInfoHandler
+      Runtime: nodejs20.x
+      Architectures:
+        - x86_64
+      Timeout: 100
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: /file-info/{id}
+            Method: GET 
+  getFileFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: src/handlers/get-file.getFileHandler
+      Runtime: nodejs20.x
+      Architectures:
+        - x86_64
+      Timeout: 100
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: /file/{id}
+            Method: GET 
+  postFileFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: src/handlers/post-file.postFileHandler
+      Runtime: nodejs20.x
+      Architectures:
+        - x86_64
+      Timeout: 100
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: /file/{id}
+            Method: POST 
 Outputs:
   WebEndpoint:
     Description: "API Gateway endpoint URL for Prod stage"

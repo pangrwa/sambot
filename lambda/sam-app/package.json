@@ -7,7 +7,8 @@
         "@aws-sdk/client-bedrock-runtime": "^3.637.0",
         "@aws-sdk/client-dynamodb": "^3.637.0",
         "@aws-sdk/client-lambda": "^3.637.0",
-        "@aws-sdk/lib-dynamodb": "^3.637.0"
+        "@aws-sdk/lib-dynamodb": "^3.637.0",
+        "lambda-multipart-parser": "^1.0.1"
     },
     "devDependencies": {
         "aws-sdk-client-mock": "^2.0.0",
