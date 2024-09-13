@@ -1,4 +1,4 @@
-import { HeadBucketCommand, NotFound, PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
+import { HeadBucketCommand, HeadObjectCommand, NotFound, PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import parser from "lambda-multipart-parser";
 
 
@@ -35,6 +35,30 @@ export const postFileHandler = async (event) => {
     }
   }
 
+  const headFileCommand = new HeadObjectCommand({
+    Bucket: BUCKET_NAME,
+    Key: `UserID=${id}/${file.filename}`
+  })
+  try {
+    const response = await client.send(headFileCommand);
+    // means file exists
+    return {
+      statusCode: 200,
+      body: JSON.stringify({
+        fileExists: true 
+      }),
+      headers: {
+        "Content-Type": "application/json"
+      }
+    }
+  } catch (error) {
+    if (error instanceof NotFound) {
+        console.log("NOT FOUND")
+    } else {
+      throw error; // some other error
+    }
+  }
+
   // Display the key/value pairs
   const putFileCommand = new PutObjectCommand({
     Bucket: BUCKET_NAME,
@@ -46,6 +70,10 @@ export const postFileHandler = async (event) => {
     const response = await client.send(putFileCommand); 
     return {
         statusCode: 200,
+        body: JSON.stringify({}),
+        headers: {
+          "Content-Type": "application/json"
+        }
     }
   } catch(error) {
     return {

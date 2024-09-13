@@ -123,7 +123,21 @@ Resources:
           Type: Api
           Properties:
             Path: /file/{id}
-            Method: POST 
+            Method: POST
+  deleteFileFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: src/handlers/delete-file.deleteFileHandler
+      Runtime: nodejs20.x
+      Architectures:
+        - x86_64
+      Timeout: 100
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: /file/{id}
+            Method: DELETE
 Outputs:
   WebEndpoint:
     Description: "API Gateway endpoint URL for Prod stage"
