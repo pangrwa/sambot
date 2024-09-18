@@ -1,7 +1,7 @@
 import { GetObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import fs from "fs";
 
-const client = new S3Client({ region: "ap-southeast-1" });
+const client = new S3Client({ region: "us-east-1" });
 const BUCKET_NAME = "3d-ai-avatar-project";
 export const getFileHandler = async (event) => {
   const pathParameters = event.pathParameters;

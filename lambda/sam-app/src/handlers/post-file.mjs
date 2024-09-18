@@ -5,7 +5,7 @@ import parser from "lambda-multipart-parser";
 /**
  * bucket name separated by prefix userID
  */
-const client = new S3Client({region: "ap-southeast-1"});
+const client = new S3Client({ region: "us-east-1" });
 const BUCKET_NAME = "3d-ai-avatar-project";
 export const postFileHandler = async (event) => {
   // remember to create subdirectories within the s3 bucket based on user ID

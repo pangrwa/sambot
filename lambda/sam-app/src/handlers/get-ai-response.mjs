@@ -2,13 +2,23 @@ import {
   BedrockRuntimeClient,
   ConverseCommand,
 } from "@aws-sdk/client-bedrock-runtime";
+import { BedrockAgentRuntimeClient, InvokeAgentCommand, RetrieveAndGenerateCommand, RetrieveCommand } from "@aws-sdk/client-bedrock-agent-runtime";
+import {
+  BedrockAgentClient,
+  GetAgentCommand,
+} from "@aws-sdk/client-bedrock-agent";
 
 import { InvokeCommand, LambdaClient } from "@aws-sdk/client-lambda";
 
 const REGION = "us-east-1";
-const MODELID = "amazon.titan-text-lite-v1";
+const MODELID = "anthropic.claude-3-haiku-20240307-v1:0";
+const KNOWLEDGE_BASE_ID = "ICFGBRQHPI";
+const AGENT_ID = "IFOSNUYPJD";
+let sessionId = undefined;
 
 const client = new BedrockRuntimeClient({ region: REGION });
+const agentRuntime = new BedrockAgentRuntimeClient({ region: REGION });
+const agentClient = new BedrockAgentClient({ region: REGION });
 const messageLambda = new LambdaClient({
   endpoint: `http://host.docker.internal:3001`,
   region: "us-west-2",
@@ -69,6 +79,44 @@ async function handleGetConversation() {
   return messages;
 }
 
+async function retrieveKnowledge(query) {
+  // don't really know how to use next token
+  const retrieveCommand = new RetrieveCommand({
+    knowledgeBaseId: KNOWLEDGE_BASE_ID,
+    retrievalQuery: {
+      text: query
+    }
+  })
+  const response = await agentRuntime.send(retrieveCommand);
+  const relatedContent = response.retrievalResults.map((o) => o.content);
+  return relatedContent;
+}
+
+async function handleAgent(query) {
+  // const getAgent = new GetAgentCommand({ agentId: AGENT_ID });
+  // const response = await agentClient.send(getAgent);
+  // console.log(response.agent);
+  const invokeAgent = new InvokeAgentCommand({ 
+    agentId: AGENT_ID,
+    agentAliasId: "W1LYO0QB4W",
+    sessionId: "1234",
+    inputText: query
+  })
+  const response = await agentRuntime.send(invokeAgent);
+  if (response.completion === undefined) {
+    throw new Error("Completion is undefined");
+  }
+
+  let completion = "";
+  for await (let chunkEvent of response.completion) {
+    const chunk = chunkEvent.chunk;
+    const decodedResponse = new TextDecoder("utf-8").decode(chunk.bytes);
+    completion += decodedResponse;
+  }
+
+  return { sessionId: sessionId, completion };
+}
+
 export const getAiResponseHandler = async (event) => {
   const userMessage = event.body;
 
@@ -83,16 +131,40 @@ export const getAiResponseHandler = async (event) => {
     };
   }
 
+
+
   let messages = await handleGetConversation();
   messages = messages.map((message) => ({
     role: message.Role,
     content: [{ text: message.Message }],
   }));
 
+  // // retrieve knowledge base
+  // const knowledges = await retrieveKnowledge(userMessage);
+  // // do some prompt engineering
+  // modifyPrompt(userMessage, knowledges);
+
+  const { sessionId, completion } =  await handleAgent(userMessage);
+
+  // test RAG
+  // retrieveAndGenerate(userMessage);
+
+  const prompt = `
+  These are some information retrieved from your knowledge base data source for you to use it help answer
+  the user question\n
+  ${completion}\n
+  When you are answering the question to the user, do not mention that you retrieve these data from a private data source,
+  treat it as if you own the data\n
+  This is the user question: \n
+  ${userMessage}
+  `
+
   const userQuestion = {
     role: "user",
-    content: [{ text: userMessage }],
+    content: [{ text: prompt}],
   };
+
+
 
   // get AI response
   messages.push(userQuestion);

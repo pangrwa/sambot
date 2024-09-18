@@ -1,6 +1,6 @@
 import { ListObjectsCommand, S3Client } from "@aws-sdk/client-s3";
 
-const client = new S3Client({ region: "ap-southeast-1" });
+const client = new S3Client({ region: "us-east-1" });
 const BUCKET_NAME = "3d-ai-avatar-project";
 export const getFileInfoHandler = async (event) => {
   const pathParameters = event.pathParameters;
