@@ -150,11 +150,18 @@ export const getAiResponseHandler = async (event) => {
   // retrieveAndGenerate(userMessage);
 
   const prompt = `
+  You are a chatbot agent that will be used by users to ask basic information about the Central Provident Fund. You should be
+  nice and polite. You should sound very welcoming and open. You don't have to input text to let the user know about your emotion or expressions.\n
   These are some information retrieved from your knowledge base data source for you to use it help answer
   the user question\n
   ${completion}\n
   When you are answering the question to the user, do not mention that you retrieve these data from a private data source,
   treat it as if you own the data\n
+  Follow these steps when you craft your output.\n
+  1. Keep you answer short, sweet and concised, just get to the point. \n
+  2. If you have multiple bullet points for the answer, choose only the top 3, you can
+    send more if the user asks for more.\n
+  3. If possible, provide more URLs for the user to read up more\n
   This is the user question: \n
   ${userMessage}
   `
@@ -182,8 +189,11 @@ export const getAiResponseHandler = async (event) => {
       // empty response text
       throw new Error("Server unable to response to user question");
     }
+    console.log(responseText);
 
     // update user conversation cache
+    // change content to remove hard-coded prompt
+    userQuestion.content[0].text = userMessage;
     handleUploadConversation(userQuestion, response.output.message);
 
     return {
