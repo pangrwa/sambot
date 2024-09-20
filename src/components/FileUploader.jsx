@@ -84,7 +84,6 @@ export default function FileUploader() {
     if (await uploadFile(file)) {
       setStatus("success");
     } else {
-      console.log("yo come one")
       setStatus("failed");
     }
   }

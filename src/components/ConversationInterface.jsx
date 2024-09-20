@@ -1,6 +1,7 @@
 import { useConversation } from "@/hooks/useConversation";
 import { Bot, CircleArrowDown } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
+import Linkify from "react-linkify";
 
 function ScrollContainer({ children }) {
   const outerDiv = useRef(null);
@@ -36,24 +37,27 @@ function ScrollContainer({ children }) {
 
   useEffect(() => {
     const handleScroll = () => {
-        const outerDivScrollTop = outerDiv.current.scrollTop;
+      const outerDivScrollTop = outerDiv.current.scrollTop;
 
-        // check if the user scrolled upwards
-        if (outerDivScrollTop < prevScrollTop.current) {
-            setShowScrollButton(true);
-        } else if (outerDivScrollTop === outerDiv.current.scrollHeight - outerDiv.current.clientHeight) {
-            setShowScrollButton(false);
-        }
+      // check if the user scrolled upwards
+      if (outerDivScrollTop < prevScrollTop.current) {
+        setShowScrollButton(true);
+      } else if (
+        outerDivScrollTop ===
+        outerDiv.current.scrollHeight - outerDiv.current.clientHeight
+      ) {
+        setShowScrollButton(false);
+      }
 
-        // update the previous scroll position 
-        prevScrollTop.current = outerDivScrollTop;
-    }
+      // update the previous scroll position
+      prevScrollTop.current = outerDivScrollTop;
+    };
 
     const outerDivCurrent = outerDiv.current;
     outerDivCurrent.addEventListener("scroll", handleScroll);
     return () => {
-        outerDivCurrent.removeEventListener("scroll", handleScroll);
-    } 
+      outerDivCurrent.removeEventListener("scroll", handleScroll);
+    };
   }, []);
 
   const handleScrollButtonClick = useCallback(() => {
@@ -113,20 +117,48 @@ function ScrollContainer({ children }) {
 function ChatMessage({ message, role }) {
   return (
     <div className="py-2 px-5 flex m-1">
-        {role === 'user' ? (
-            <div className="p-3 ml-auto bg-slate-200 rounded-xl">{message}</div>
-        ) : (
-            <div className="mr-auto"> 
-              <Bot />
-              <div className="p-3 self-start">{message}</div>
-            </div>
-        ) }
+      {role === "user" ? (
+        <div className="p-3 ml-auto bg-slate-200 rounded-xl">
+          {message.split("\n").map((text, index) => (
+            <span key={index}>
+              <Linkify
+                options={{
+                  target: "_blank",
+                  className: "text-red-50 font-bold",
+                }}
+              >
+                {text}
+              </Linkify>
+              <br />
+            </span>
+          ))}
+        </div>
+      ) : (
+        <div className="mr-auto">
+          <Bot />
+          <div className="p-3 self-start">
+            {message.split("\n").map((text, index) => (
+            <span key={index}>
+              <Linkify
+                options={{
+                  target: "_blank",
+                  className: "text-red-50 font-bold",
+                }}
+              >
+                {text}
+              </Linkify>
+              <br />
+            </span>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
 
 function ConversationInterface() {
-  const {conversations, getConversations} = useConversation();
+  const { conversations, getConversations } = useConversation();
 
   useEffect(() => {
     getConversations();
@@ -138,13 +170,15 @@ function ConversationInterface() {
         <div className="h-[500px] w-full border-green border-2">
           <ScrollContainer>
             {conversations.map((message, index) => (
-                <ChatMessage key={index} message={message.message} role={message.role}/>
+              <ChatMessage
+                key={index}
+                message={message.message}
+                role={message.role}
+              />
             ))}
           </ScrollContainer>
         </div>
-        <div className="pt-5">
-            Clear Conversation
-        </div>
+        <div className="pt-5">Clear Conversation</div>
       </div>
     </>
   );
