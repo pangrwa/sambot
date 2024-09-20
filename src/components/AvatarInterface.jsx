@@ -15,6 +15,7 @@ function AvatarInterface() {
   const mediaStream = useRef(null);
   const [isLoaded, setIsLoaded] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isSpeaking, setIsSpeaking] = useState(false);
   const [stream, setStream] = useState();
   const [debug, setDebug] = useState();
   const [data, setData] = useState();
@@ -39,6 +40,9 @@ function AvatarInterface() {
           },
           setDebug
         );
+        avatar.current.addEventHandler("avatar_stop_talking", (data) => {
+          setIsSpeaking(false);
+        });
         setData(res);
         setStream(avatar.current.mediaStream); // invoke useEffect to load video
         setIsLoaded(true);
@@ -147,10 +151,12 @@ function AvatarInterface() {
     async function handleSpeak() {
       if (!avatar.current) {
         console.log("Avatar API is not initialised");
+        setIsSpeaking(false);
         return;
       }
       if (!data) {
         console.log("No active session");
+        setIsSpeaking(false);
         return;
       }
       console.log(aiResponse);
@@ -180,6 +186,7 @@ function AvatarInterface() {
   }
 
   function sendMessage() {
+    setIsSpeaking(true);
     setIsLoading(true);
     setConversations((prevConversation) => [...prevConversation, {
       role: 'user',
@@ -228,16 +235,16 @@ function AvatarInterface() {
           ref={input}
           onInput={handleInput}
           onKeyDown={(e) => {
-            if (e.key == 'Enter') {
-              if (isLoading || !content.trim()) {
+            if (e.key == 'Enter' && !e.shiftKey) {
+              e.preventDefault(); // prevent new line
+              if (!stream || isLoading || !content.trim() || isSpeaking) {
                 return; // shouldn't submit an event
               }
-              e.preventDefault(); // prevent new line
               sendMessage()
             }
           }}
         ></Textarea>
-        <Button onClick={sendMessage} disabled={!stream || isLoading || !content.trim()}>
+        <Button onClick={sendMessage} disabled={!stream || isLoading || !content.trim() || isSpeaking}>
           Send
         </Button>
       </div>

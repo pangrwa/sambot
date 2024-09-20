@@ -25,19 +25,19 @@ export const FileProvider = ({ children }) => {
 
   async function getFileNames() {
     try {
-      console.log("Getting files....");
       const fileResponse = await fetch("/api/file-info/1");
-      let fileNamesData = await fileResponse.json();
       if (!fileResponse.ok) {
-        console.error("Server something wrong...");
+        setError("Server is down");
         return;
       }
+      let fileNamesData = await fileResponse.json();
       fileNamesData = fileNamesData.map((f) => ({
         filename: cleanPrefixFilename(f.key),
         lastModified: convertDate(f.lastModified),
       }));
       setFileNames(fileNamesData);
     } catch (error) {
+      setError("Failed to get files: " + error.message);
       console.error("Failed to get files: ", error.message);
     }
   }

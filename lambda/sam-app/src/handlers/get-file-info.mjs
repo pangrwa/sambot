@@ -18,10 +18,17 @@ export const getFileInfoHandler = async (event) => {
   });
   try {
     const { Contents } = await client.send(listObjectsCommand);
-    const fileInfo = Contents.map((c) => ({
-        key: c.Key,
-        lastModified: c.LastModified,
-    }))
+
+    let fileInfo;
+    if (!Contents) {
+      fileInfo = []
+    } else {
+      fileInfo = Contents.map((c) => ({
+          key: c.Key,
+          lastModified: c.LastModified,
+      }))
+    }
+
     return {
         statusCode: 200, 
         body: JSON.stringify(fileInfo),

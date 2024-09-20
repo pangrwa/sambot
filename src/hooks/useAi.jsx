@@ -17,10 +17,11 @@ export const AIProvider = ({ children }) => {
         },
         body: question
       })
-      let aiMessage = await aiResponse.text(); 
-      console.log(aiMessage)
+      let aiMessage;
       if (!aiResponse.ok) {
         aiMessage = "I am currently unable to answer your question."
+      } else {
+        aiMessage = await aiResponse.text(); 
       }
       setAiResponse(aiMessage);
       setConversations((prevConversations) => [...prevConversations, {
