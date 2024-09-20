@@ -15,10 +15,12 @@ import {
 import { useFile } from "@/hooks/useFiles";
 
 function Result({ status }) {
+  const { error } = useFile(); 
+
   if (status === "success") {
     return <p>✅ File uploaded successfully!</p>;
   } else if (status === "failed") {
-    return <p>❌ File upload failed!</p>;
+    return <p>❌ File upload failed! {error}</p>;
   } else if (status === "uploading") {
     return <p>⏳ Uploading selected file...</p>;
   } else {
@@ -26,7 +28,7 @@ function Result({ status }) {
   }
 }
 
-function FileDialog({file, handleFileChange, handleUpload, status}) {
+function FileDialog({file, handleFileChange, handleUpload, status, handleCloseDialog}) {
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>
@@ -55,8 +57,8 @@ function FileDialog({file, handleFileChange, handleUpload, status}) {
           <Result status={status} />
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction>Continue</AlertDialogAction>
+          <AlertDialogCancel onClick={handleCloseDialog} disabled={status == "success" || status == "uploading"}>Cancel</AlertDialogCancel>
+          <AlertDialogAction onClick={handleCloseDialog} disabled={status != "success"}>Continue</AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
@@ -76,6 +78,12 @@ export default function FileUploader() {
     }
   }
 
+  function handleCloseDialog() {
+    // clean up
+    setFile(null);
+    setStatus("initial")
+  }
+
   async function handleUpload() {
     if (!file) {
       return;
@@ -90,7 +98,7 @@ export default function FileUploader() {
 
   return (
     <div className="self-end">
-      <FileDialog file={file} handleFileChange={handleFileChange} handleUpload={handleUpload} status={status}/>
+      <FileDialog file={file} handleFileChange={handleFileChange} handleUpload={handleUpload} status={status} handleCloseDialog={handleCloseDialog}/>
     </div>
   );
 }

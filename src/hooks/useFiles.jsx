@@ -1,5 +1,5 @@
 import { createContext, useContext, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useRouteError, useSearchParams } from "react-router-dom";
 
 const FileContext = createContext();
 
@@ -21,6 +21,7 @@ function convertDate(isoDate) {
 }
 export const FileProvider = ({ children }) => {
   const [fileNames, setFileNames] = useState([]);
+  const [error, setError] = useState(null);
 
   async function getFileNames() {
     try {
@@ -87,7 +88,7 @@ export const FileProvider = ({ children }) => {
         method: "DELETE",
       });
 
-      const data = await deleteResponse.text();
+      // const data = await deleteResponse.text();
       setFileNames(fileNames.filter((f) => f.filename != filename));
     } catch (error) {
       console.error("Failed to delete file: ", error.message)
@@ -95,6 +96,8 @@ export const FileProvider = ({ children }) => {
   }
 
   async function uploadFile(file) {
+    setError(null);  // clear any previous error
+
     const formData = new FormData();
     formData.append("file", file);
     try {
@@ -104,14 +107,12 @@ export const FileProvider = ({ children }) => {
         body: formData,
       });
       if (!fileResponse.ok) {
+        setError("Server is down")
         return false;
       }
       const responseData = await fileResponse.json()
-      console.log(responseData)
       if (responseData.fileExists) {
-        // do something here
-        // probably need to do something here to notify the user that
-        // this filename already exists in the s3 bucket
+        setError("Filename already exists")
         return false;
       } else {
         setFileNames([{
@@ -121,13 +122,14 @@ export const FileProvider = ({ children }) => {
         return true;
       }
     } catch (error) {
-      console.error(error);
+      // handle network or server errors
+      setError("Something went wrong. Please try again latter")
       return false;
     }
   }
 
   return (
-    <FileContext.Provider value={{ fileNames, setFileNames, getFileNames, downloadFile, deleteFile, uploadFile }}>
+    <FileContext.Provider value={{ fileNames, setFileNames, getFileNames, downloadFile, deleteFile, uploadFile, error, setError }}>
       {children}
     </FileContext.Provider>
   );
