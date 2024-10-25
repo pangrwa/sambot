@@ -178,7 +178,7 @@ export const getAiResponseHandler = async (event) => {
   const command = new ConverseCommand({
     modelId: MODELID,
     messages: messages,
-    inferenceConfig: { maxTokens: 512, temperature: 0.5, topP: 0.9 },
+    inferenceConfig: { maxTokens: 256, temperature: 0.5, topP: 0.9 },
   });
 
   try {
